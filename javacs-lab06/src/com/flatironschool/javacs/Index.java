@@ -8,20 +8,22 @@ import java.util.HashSet;
 
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 
 /**
  * Encapsulates a map from search term to set of TermCounter.
- * 
+ *
  * @author downey
  *
  */
 public class Index {
 
 	private Map<String, Set<TermCounter>> index = new HashMap<String, Set<TermCounter>>();
-	
+
 	/**
 	 * Adds a TermCounter to the set associated with `term`.
-	 * 
+	 *
 	 * @param term
 	 * @param tc
 	 */
@@ -39,7 +41,7 @@ public class Index {
 
 	/**
 	 * Looks up a search term and returns a set of TermCounters.
-	 * 
+	 *
 	 * @param term
 	 * @return
 	 */
@@ -49,16 +51,22 @@ public class Index {
 
 	/**
 	 * Add a page to the index.
-	 * 
+	 *
 	 * @param url         URL of the page.
 	 * @param paragraphs  Collection of elements that should be indexed.
 	 */
 	public void indexPage(String url, Elements paragraphs) {
 		// make a TermCounter and count the terms in the paragraphs
         // TODO: fill this in
-		
+        TermCounter tc = new TermCounter(url);
+        tc.processElements(paragraphs);
+
+
 		// for each term in the TermCounter, add the TermCounter to the index
         // TODO: fill this in
+        for (String term : tc.keySet()) {
+        	add(term, tc);
+        }
 	}
 
 	/**
@@ -68,7 +76,7 @@ public class Index {
 		// loop through the search terms
 		for (String term: keySet()) {
 			System.out.println(term);
-			
+
 			// for each term, print the pages where it appears
 			Set<TermCounter> tcs = get(term);
 			for (TermCounter tc: tcs) {
@@ -80,7 +88,7 @@ public class Index {
 
 	/**
 	 * Returns the set of terms that have been indexed.
-	 * 
+	 *
 	 * @return
 	 */
 	public Set<String> keySet() {
@@ -89,21 +97,21 @@ public class Index {
 
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		
+
 		WikiFetcher wf = new WikiFetcher();
 		Index indexer = new Index();
 
 		String url = "https://en.wikipedia.org/wiki/Java_(programming_language)";
 		Elements paragraphs = wf.fetchWikipedia(url);
 		indexer.indexPage(url, paragraphs);
-		
+
 		url = "https://en.wikipedia.org/wiki/Programming_language";
 		paragraphs = wf.fetchWikipedia(url);
 		indexer.indexPage(url, paragraphs);
-		
+
 		indexer.printIndex();
 	}
 
